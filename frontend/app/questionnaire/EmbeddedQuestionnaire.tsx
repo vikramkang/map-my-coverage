@@ -397,106 +397,172 @@ export default function EmbeddedQuestionnaire({
             </>
           )}
 
-          {report && (
-            <div style={{ marginTop: 10 }}>
-              <div
-                style={{
-                  padding: "10px 12px",
-                  borderRadius: 10,
-                  backgroundColor: "rgba(15, 23, 42, 0.65)",
-                  marginBottom: 12,
-                }}
-              >
+            {report && (
+              <div style={{ marginTop: 10 }}>
+                {/* Overall score */}
                 <div
                   style={{
-                    fontSize: 11,
-                    textTransform: "uppercase",
-                    letterSpacing: 0.08,
-                    color: "#9ca3af",
-                    marginBottom: 4,
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    backgroundColor: "rgba(15, 23, 42, 0.65)",
+                    marginBottom: 12,
                   }}
                 >
-                  Overall score
-                </div>
-                <div
-                  style={{
-                    fontSize: 26,
-                    fontWeight: 700,
-                  }}
-                >
-                  {report.assessment.overall_risk_score}
-                  <span
+                  <div
                     style={{
-                      fontSize: 13,
-                      fontWeight: 400,
-                      marginLeft: 6,
+                      fontSize: 11,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.08,
                       color: "#9ca3af",
+                      marginBottom: 4,
                     }}
                   >
-                    / 100
-                  </span>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "grid",
-                  gap: 10,
-                  gridTemplateColumns:
-                    "repeat(auto-fit, minmax(150px, 1fr))",
-                }}
-              >
-                {Object.entries(report.assessment.categories).map(
-                  ([key, cat]: any) => (
-                    <div
-                      key={key}
+                    Overall score
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 26,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {report.assessment.overall_risk_score}
+                    <span
                       style={{
-                        borderRadius: 10,
-                        border:
-                          "1px solid rgba(148, 163, 184, 0.4)",
-                        padding: "8px 10px",
-                        backgroundColor:
-                          "rgba(15, 23, 42, 0.7)",
+                        fontSize: 13,
+                        fontWeight: 400,
+                        marginLeft: 6,
+                        color: "#9ca3af",
                       }}
                     >
+                      / 100
+                    </span>
+                  </div>
+                </div>
+
+                {/* Categories */}
+                <div
+                  style={{
+                    display: "grid",
+                    gap: 10,
+                    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                  }}
+                >
+                  {Object.entries(report.assessment.categories).map(
+                    ([key, cat]: any) => (
                       <div
+                        key={key}
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          fontSize: 12,
-                          marginBottom: 4,
+                          borderRadius: 10,
+                          border: "1px solid rgba(148, 163, 184, 0.4)",
+                          padding: "8px 10px",
+                          backgroundColor: "rgba(15, 23, 42, 0.7)",
                         }}
                       >
-                        <span
+                        <div
                           style={{
-                            textTransform: "uppercase",
-                            letterSpacing: 0.08,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            fontSize: 12,
+                            marginBottom: 4,
                           }}
                         >
-                          {key}
-                        </span>
-                        <span>{(cat as any).score}</span>
+                          <span
+                            style={{
+                              textTransform: "uppercase",
+                              letterSpacing: 0.08,
+                            }}
+                          >
+                            {key}
+                          </span>
+                          <span>{(cat as any).score}</span>
+                        </div>
+                        <ul
+                          style={{
+                            margin: 0,
+                            paddingLeft: 16,
+                            fontSize: 11,
+                            color: "#d1d5db",
+                          }}
+                        >
+                          {(cat as any).recommendations.slice(0, 2).map(
+                            (r: any, idx: number) => (
+                              <li key={idx}>{r.title}</li>
+                            )
+                          )}
+                        </ul>
                       </div>
-                      <ul
-                        style={{
-                          margin: 0,
-                          paddingLeft: 16,
-                          fontSize: 11,
-                          color: "#d1d5db",
-                        }}
-                      >
-                        {(cat as any).recommendations
-                          .slice(0, 2)
-                          .map((r: any, idx: number) => (
-                            <li key={idx}>{r.title}</li>
-                          ))}
-                      </ul>
+                    )
+                  )}
+                </div>
+
+                {/* AI advice block */}
+                {report.ai_advice && (
+                  <div
+                    style={{
+                      marginTop: 16,
+                      paddingTop: 12,
+                      borderTop: "1px solid rgba(148, 163, 184, 0.4)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 11,
+                        textTransform: "uppercase",
+                        letterSpacing: 0.08,
+                        color: "#9ca3af",
+                        marginBottom: 6,
+                      }}
+                    >
+                      AI summary (beta)
                     </div>
-                  )
+                    <p
+                      style={{
+                        fontSize: 13,
+                        color: "#e5e7eb",
+                        marginTop: 0,
+                        marginBottom: 8,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {report.ai_advice.summary}
+                    </p>
+
+                    {Array.isArray(report.ai_advice.bullets) &&
+                      report.ai_advice.bullets.length > 0 && (
+                        <ul
+                          style={{
+                            margin: 0,
+                            paddingLeft: 18,
+                            fontSize: 12,
+                            color: "#d1d5db",
+                          }}
+                        >
+                          {report.ai_advice.bullets.map(
+                            (b: string, idx: number) => (
+                              <li key={idx} style={{ marginBottom: 4 }}>
+                                {b}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      )}
+
+                    <p
+                      style={{
+                        fontSize: 10,
+                        color: "#9ca3af",
+                        marginTop: 8,
+                      }}
+                    >
+                      This explanation is generated by AI for general education only and
+                      is not financial, legal, or insurance advice. Please confirm details
+                      with a licensed advisor.
+                    </p>
+                  </div>
                 )}
               </div>
-            </div>
-          )}
+            )}
+
         </aside>
       </div>
     </div>

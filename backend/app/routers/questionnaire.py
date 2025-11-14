@@ -13,6 +13,7 @@ from ..schemas import (
 )
 from ..deps import get_current_user
 from ..services import risk_engine
+from ..ai_engine import generate_ai_advice
 
 router = APIRouter(prefix="/questionnaires", tags=["questionnaires"])
 
@@ -130,7 +131,8 @@ def complete_questionnaire(
         current_user: models.user.User = Depends(get_current_user),
 ):
     """
-    Mark questionnaire as completed, run risk engine, and return a report.
+    Mark questionnaire as completed, run risk engine, and return a report
+    including an AI-generated explanation.
     """
     q = (
         db.query(models.questionnaire.Questionnaire)
@@ -141,7 +143,10 @@ def complete_questionnaire(
         .first()
     )
     if not q:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Questionnaire not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Questionnaire not found",
+        )
 
     # Build context from answers
     context: Dict[str, Any] = {}
@@ -152,20 +157,24 @@ def complete_questionnaire(
             value = ans.answer_json
         context[ans.question_key] = value
 
-    # Run risk engine
-    result = risk_engine.evaluate(context)
+    # Run rule-based risk engine
+    assessment = risk_engine.evaluate(context)
+
+    # Call AI explainer (will fallback if OPENAI_API_KEY not set)
+    ai_advice = generate_ai_advice(context=context, assessment=assessment)
 
     # Mark as completed
     q.status = "completed"
     db.commit()
     db.refresh(q)
 
-    # Build simple report payload
+    # Payload returned to frontend
     report = {
         "questionnaire_id": q.id,
         "status": q.status,
         "context": context,
-        "assessment": result,
+        "assessment": assessment,
+        "ai_advice": ai_advice,
     }
 
     return report
