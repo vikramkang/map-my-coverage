@@ -18,8 +18,8 @@ app = FastAPI(lifespan=lifespan)
 
 # 👇 allow frontend to call backend during dev
 origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://localhost:3000",                  # local dev frontend
+    "https://map-my-coverage.vercel.app",     # your Vercel frontend
 ]
 
 app.add_middleware(
