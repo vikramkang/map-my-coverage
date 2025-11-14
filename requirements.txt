@@ -1,0 +1,16 @@
+fastapi~=0.121.2
+uvicorn[standard]~=0.30.0
+
+sqlalchemy~=2.0.44
+
+pydantic~=2.12.4
+
+# Password hashing (with bcrypt) – note the extras + explicit bcrypt pin
+passlib[bcrypt]~=1.7.4
+bcrypt==4.0.1
+
+# JWT tokens for login
+python-jose[cryptography]~=3.3.0
+
+# Needed for form data (login endpoint using x-www-form-urlencoded)
+python-multipart~=0.0.9
